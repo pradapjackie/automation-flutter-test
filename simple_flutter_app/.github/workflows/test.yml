@@ -1,0 +1,234 @@
+name: Flutter Tests (Patrol + Integration)
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+env:
+  FLUTTER_VERSION: '3.19.0'
+
+jobs:
+  # Unit Tests
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: 'stable'
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Run unit tests
+        run: flutter test
+
+  # Integration Tests for Web
+  integration-tests-web:
+    name: Integration Tests (Web)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: 'stable'
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Enable web
+        run: flutter config --enable-web
+
+      - name: Run integration tests on web
+        run: flutter test integration_test/ -d chrome
+
+  # Integration Tests for Android
+  integration-tests-android:
+    name: Integration Tests (Android)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: 'stable'
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Create Android Virtual Device
+        run: |
+          echo "Creating Android Virtual Device..."
+          echo "no" | avdmanager create avd \
+            -n "test_device" \
+            -k "system-images;android-30;google_apis;x86_64" \
+            --force
+
+      - name: Start Android Emulator
+        run: |
+          echo "Starting Android emulator..."
+          $ANDROID_HOME/emulator/emulator \
+            -avd test_device \
+            -no-audio \
+            -no-window \
+            -gpu swiftshader_indirect \
+            -camera-back none \
+            -camera-front none \
+            -memory 2048 \
+            -skin 1080x1920 &
+          adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done; input keyevent 82'
+
+      - name: Run integration tests on Android
+        run: |
+          flutter test integration_test/ -d emulator-5554
+        timeout-minutes: 10
+
+  # Patrol Tests for Web
+  patrol-tests-web:
+    name: Patrol Tests (Web)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: 'stable'
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Enable web
+        run: flutter config --enable-web
+
+      - name: Run Patrol tests on web
+        run: flutter test integration_test/patrol_test.dart -d chrome
+
+  # Patrol Tests for Android
+  patrol-tests-android:
+    name: Patrol Tests (Android)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: 'stable'
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Create Android Virtual Device
+        run: |
+          echo "Creating Android Virtual Device..."
+          echo "no" | avdmanager create avd \
+            -n "test_device" \
+            -k "system-images;android-30;google_apis;x86_64" \
+            --force
+
+      - name: Start Android Emulator
+        run: |
+          echo "Starting Android emulator..."
+          $ANDROID_HOME/emulator/emulator \
+            -avd test_device \
+            -no-audio \
+            -no-window \
+            -gpu swiftshader_indirect \
+            -camera-back none \
+            -camera-front none \
+            -memory 2048 \
+            -skin 1080x1920 &
+          adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done; input keyevent 82'
+
+      - name: Run Patrol tests on Android
+        run: |
+          flutter test integration_test/patrol_test.dart -d emulator-5554
+        timeout-minutes: 10
+
+  # Test Summary
+  test-summary:
+    name: Test Summary
+    runs-on: ubuntu-latest
+    needs: [unit-tests, integration-tests-web, integration-tests-android, patrol-tests-web, patrol-tests-android]
+    if: always()
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Test Results Summary
+        run: |
+          echo "## Test Results Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Test Type | Platform | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----------|----------|--------|" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ needs.unit-tests.result }}" == "success" ]; then
+            echo "| Unit Tests | All | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Unit Tests | All | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [ "${{ needs.integration-tests-web.result }}" == "success" ]; then
+            echo "| Integration Tests | Web | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Integration Tests | Web | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [ "${{ needs.integration-tests-android.result }}" == "success" ]; then
+            echo "| Integration Tests | Android | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Integration Tests | Android | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [ "${{ needs.patrol-tests-web.result }}" == "success" ]; then
+            echo "| Patrol Tests | Web | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Patrol Tests | Web | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [ "${{ needs.patrol-tests-android.result }}" == "success" ]; then
+            echo "| Patrol Tests | Android | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Patrol Tests | Android | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Overall Status:** ${{ needs.unit-tests.result == 'success' && needs.integration-tests-web.result == 'success' && needs.integration-tests-android.result == 'success' && needs.patrol-tests-web.result == 'success' && needs.patrol-tests-android.result == 'success' && '✅ All Tests Passed' || '❌ Some Tests Failed' }}" >> $GITHUB_STEP_SUMMARY
