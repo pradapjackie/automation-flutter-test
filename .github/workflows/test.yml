@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 env:
-  FLUTTER_VERSION: '3.26.0'
+  FLUTTER_VERSION: '3.24.0'
 
 jobs:
   # Unit Tests
