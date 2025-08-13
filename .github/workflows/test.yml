@@ -15,6 +15,9 @@ jobs:
   unit-tests:
     name: Unit Tests
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: simple_flutter_app
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -35,6 +38,9 @@ jobs:
   integration-tests-web:
     name: Integration Tests (Web)
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: simple_flutter_app
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -58,6 +64,9 @@ jobs:
   integration-tests-android:
     name: Integration Tests (Android)
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: simple_flutter_app
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -111,6 +120,9 @@ jobs:
   patrol-tests-web:
     name: Patrol Tests (Web)
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: simple_flutter_app
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -134,6 +146,9 @@ jobs:
   patrol-tests-android:
     name: Patrol Tests (Android)
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: simple_flutter_app
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
