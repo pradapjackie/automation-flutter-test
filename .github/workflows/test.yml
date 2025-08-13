@@ -89,12 +89,17 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
+      - name: Install Android System Image
+        run: |
+          echo "Installing Android system image..."
+          sdkmanager "system-images;android-33;google_apis;x86_64"
+
       - name: Create Android Virtual Device
         run: |
           echo "Creating Android Virtual Device..."
           echo "no" | avdmanager create avd \
             -n "test_device" \
-            -k "system-images;android-30;google_apis;x86_64" \
+            -k "system-images;android-33;google_apis;x86_64" \
             --force
 
       - name: Start Android Emulator
@@ -171,12 +176,17 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
+      - name: Install Android System Image
+        run: |
+          echo "Installing Android system image..."
+          sdkmanager "system-images;android-33;google_apis;x86_64"
+
       - name: Create Android Virtual Device
         run: |
           echo "Creating Android Virtual Device..."
           echo "no" | avdmanager create avd \
             -n "test_device" \
-            -k "system-images;android-30;google_apis;x86_64" \
+            -k "system-images;android-33;google_apis;x86_64" \
             --force
 
       - name: Start Android Emulator
