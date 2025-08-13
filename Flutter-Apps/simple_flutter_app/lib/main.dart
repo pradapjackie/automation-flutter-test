@@ -224,7 +224,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  key: Key('${title.replaceAll('! 👋', 'CardTitle')}'),
+                  key: Key(title.replaceAll('! 👋', 'CardTitle')),
                   title,
                   style: const TextStyle(
                     fontSize: 18,
@@ -234,7 +234,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  key: Key('${title.replaceAll('! 👋', 'CardSubtitle')}'),
+                  key: Key(title.replaceAll('! 👋', 'CardSubtitle')),
                   subtitle,
                   style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                 ),
