@@ -1,4 +1,4 @@
-name: Flutter Tests (Web + Android Only)
+name: Web + Android Tests Only
 
 on:
   push:
@@ -195,7 +195,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### 📱 Test Coverage:" >> $GITHUB_STEP_SUMMARY
           echo "- **Integration Tests**: All major functionality tested" >> $GITHUB_STEP_SUMMARY
-          echo "- **Patrol Tests**: Advanced testing scenarios covered" >> $GITHUB_STEP_SUMMARY
+          echo "- **Patrol Tests**: Advanced testing scenarios covered" >> $GITHUB_SUMMARY
           echo "- **Cross-Platform**: Tests run on Web and Android platforms only" >> $GITHUB_STEP_SUMMARY
           echo "- **Build Verification**: Web and Android builds verified" >> $GITHUB_STEP_SUMMARY
 
