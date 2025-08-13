@@ -34,9 +34,9 @@ jobs:
       - name: Run unit tests
         run: flutter test
 
-  # Integration Tests for Web
-  integration-tests-web:
-    name: Integration Tests (Web)
+  # Web Tests
+  web-tests:
+    name: Web Tests
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -58,7 +58,7 @@ jobs:
         run: flutter config --enable-web
 
       - name: Run integration tests on web
-        run: flutter test integration_test/ -d chrome
+        run: flutter test -d chrome
 
   # Integration Tests for Android
   integration-tests-android:
@@ -145,7 +145,7 @@ jobs:
         run: flutter config --enable-web
 
       - name: Run Patrol tests on web
-        run: flutter test integration_test/patrol_test.dart -d chrome
+        run: flutter test -d chrome
 
   # Patrol Tests for Android
   patrol-tests-android:
@@ -212,7 +212,7 @@ jobs:
   test-summary:
     name: Test Summary
     runs-on: ubuntu-latest
-    needs: [unit-tests, integration-tests-web, integration-tests-android, patrol-tests-web, patrol-tests-android]
+    needs: [unit-tests, web-tests, integration-tests-android, patrol-tests-web, patrol-tests-android]
     if: always()
     steps:
       - name: Checkout code
@@ -231,10 +231,10 @@ jobs:
             echo "| Unit Tests | All | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
           fi
           
-          if [ "${{ needs.integration-tests-web.result }}" == "success" ]; then
-            echo "| Integration Tests | Web | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ needs.web-tests.result }}" == "success" ]; then
+            echo "| Web Tests | Chrome | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
           else
-            echo "| Integration Tests | Web | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
+            echo "| Web Tests | Chrome | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
           fi
           
           if [ "${{ needs.integration-tests-android.result }}" == "success" ]; then
@@ -256,4 +256,4 @@ jobs:
           fi
           
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Overall Status:** ${{ needs.unit-tests.result == 'success' && needs.integration-tests-web.result == 'success' && needs.integration-tests-android.result == 'success' && needs.patrol-tests-web.result == 'success' && needs.patrol-tests-android.result == 'success' && '✅ All Tests Passed' || '❌ Some Tests Failed' }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Overall Status:** ${{ needs.unit-tests.result == 'success' && needs.web-tests.result == 'success' && needs.integration-tests-android.result == 'success' && needs.patrol-tests-web.result == 'success' && needs.patrol-tests-android.result == 'success' && '✅ All Tests Passed' || '❌ Some Tests Failed' }}" >> $GITHUB_STEP_SUMMARY
