@@ -25,22 +25,22 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: 'stable'
 
-      - name: Change to project directory
-        run: cd simple_flutter_app
+      - name: Change to Flutter project directory
+        run: cd Flutter-Apps/simple_flutter_app
 
       - name: Install dependencies
         run: |
-          cd simple_flutter_app
+          cd Flutter-Apps/simple_flutter_app
           flutter pub get
 
       - name: Analyze project source
         run: |
-          cd simple_flutter_app
+          cd Flutter-Apps/simple_flutter_app
           flutter analyze
 
       - name: Run unit tests
         run: |
-          cd simple_flutter_app
+          cd Flutter-Apps/simple_flutter_app
           flutter test
 
   # Android Tests
@@ -64,9 +64,9 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
-      - name: Change to project directory and install dependencies
+      - name: Change to Flutter project directory and install dependencies
         run: |
-          cd simple_flutter_app
+          cd Flutter-Apps/simple_flutter_app
           flutter pub get
 
       - name: Setup Android SDK
@@ -91,13 +91,13 @@ jobs:
 
       - name: Run integration tests on Android
         run: |
-          cd simple_flutter_app
+          cd Flutter-Apps/simple_flutter_app
           flutter test integration_test/ -d android
         timeout-minutes: 15
 
       - name: Run Patrol tests on Android
         run: |
-          cd simple_flutter_app
+          cd Flutter-Apps/simple_flutter_app
           flutter test integration_test/patrol_test.dart -d android
         timeout-minutes: 10
 
@@ -116,25 +116,25 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: 'stable'
 
-      - name: Change to project directory and install dependencies
+      - name: Change to Flutter project directory and install dependencies
         run: |
-          cd simple_flutter_app
+          cd Flutter-Apps/simple_flutter_app
           flutter pub get
 
       - name: Enable web support
         run: |
-          cd simple_flutter_app
+          cd Flutter-Apps/simple_flutter_app
           flutter config --enable-web
 
       - name: Run integration tests on web
         run: |
-          cd simple_flutter_app
+          cd Flutter-Apps/simple_flutter_app
           flutter test integration_test/ -d web-server --web-port 8080
         timeout-minutes: 10
 
       - name: Run Patrol tests on web
         run: |
-          cd simple_flutter_app
+          cd Flutter-Apps/simple_flutter_app
           flutter test integration_test/patrol_test.dart -d web-server --web-port 8080
         timeout-minutes: 10
 
@@ -153,24 +153,24 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: 'stable'
 
-      - name: Change to project directory and install dependencies
+      - name: Change to Flutter project directory and install dependencies
         run: |
-          cd simple_flutter_app
+          cd Flutter-Apps/simple_flutter_app
           flutter pub get
 
       - name: Enable web support
         run: |
-          cd simple_flutter_app
+          cd Flutter-Apps/simple_flutter_app
           flutter config --enable-web
 
       - name: Build for web
         run: |
-          cd simple_flutter_app
+          cd Flutter-Apps/simple_flutter_app
           flutter build web
 
       - name: Build for Android
         run: |
-          cd simple_flutter_app
+          cd Flutter-Apps/simple_flutter_app
           flutter build apk --debug
 
   # Test Summary
@@ -205,5 +205,5 @@ jobs:
         with:
           name: test-results
           path: |
-            simple_flutter_app/build/
+            Flutter-Apps/simple_flutter_app/build/
           retention-days: 7
